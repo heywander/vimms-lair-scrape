@@ -7,13 +7,17 @@ Adaptable for Other Games: To scrape other game directories, simply change xbox_
 
 Usage
 Install dependencies:
+
 pip install requests beautifulsoup4
 
 Run the script:
+
 python script.py
 
 
 
 Important Notes
+
 Respect Site Limits: The script includes basic safeguards. Add rate limiting if making frequent requests.
+
 Disclaimer: Use responsibly and in accordance with Vimm’s Lair’s terms of service.
