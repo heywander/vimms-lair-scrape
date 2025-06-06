@@ -14,11 +14,11 @@ target_letters = ['J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
 # Dictionary to hold game data
 games_data = {}
 
-# Function to gather a specific game disk's download link
-def get_disk_download_link(media_id, disk_number, game_title):
+# Function to gather a specific game disc's download link
+def get_disc_download_link(media_id, disc_number, game_title):
     download_url = f"{download_base_url}/?mediaId={media_id}"
     return {
-        "disk": disk_number,
+        "disc": disc_number,
         "download_url": download_url
     }
 
@@ -49,28 +49,28 @@ def scrape_data():
                     # Initialize game entry in dictionary
                     games_data[game_title] = {
                         "game_url": full_game_url,
-                        "disks": []
+                        "discs": []
                     }
                     
                     game_page_response = requests.get(full_game_url)
                     game_soup = BeautifulSoup(game_page_response.text, 'html.parser')
                     
-                    # Check for disk selector dropdown and media IDs in JavaScript
+                    # Check for disc selector dropdown and media IDs in JavaScript
                     script_tags = game_soup.find_all('script')
                     media_ids = re.findall(r'"ID":(\d+)', str(script_tags))
                     
                     if media_ids:
                         for idx, media_id in enumerate(media_ids, 1):
-                            disk_number = f"Disc {idx}"
-                            games_data[game_title]["disks"].append(
-                                get_disk_download_link(media_id, disk_number, game_title)
+                            disc_number = f"Disc {idx}"
+                            games_data[game_title]["discs"].append(
+                                get_disc_download_link(media_id, disc_number, game_title)
                             )
                     else:
                         media_id_input = game_soup.find('input', {'name': 'mediaId'})
                         if media_id_input:
                             media_id = media_id_input['value']
-                            games_data[game_title]["disks"].append(
-                                get_disk_download_link(media_id, "Single Disk", game_title)
+                            games_data[game_title]["discs"].append(
+                                get_disc_download_link(media_id, "Single Disc", game_title)
                             )
                         else:
                             print(f"No media ID found for {game_title}")
@@ -93,30 +93,30 @@ def load_game_data():
 # Function to download games based on the loaded data
 def start_downloads(games_data):
     for game_title, data in games_data.items():
-        for disk in data["disks"]:
-            download_disk(disk["download_url"], game_title, disk["disk"])
+        for disc in data["discs"]:
+            download_disc(disc["download_url"], game_title, disc["disc"])
             time.sleep(1)  # Optional delay to avoid overloading the server
 
-# Download function for each game disk
-def download_disk(download_url, game_title, disk_number):
+# Download function for each game disc
+def download_disc(download_url, game_title, disc_number):
     headers = {
         "Referer": "https://vimm.net/",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
     }
     try:
-        print(f"Downloading {game_title} - {disk_number} from {download_url}")
+        print(f"Downloading {game_title} - {disc_number} from {download_url}")
         response = requests.get(download_url, headers=headers, stream=True)
         response.raise_for_status()
         
         # Save the downloaded file
-        file_path = f"{game_title}_{disk_number}.iso"
+        file_path = f"{game_title}_{disc_number}.iso"
         with open(file_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
         
-        print(f"Downloaded {game_title} - {disk_number} successfully.")
+        print(f"Downloaded {game_title} - {disc_number} successfully.")
     except requests.exceptions.RequestException as e:
-        print(f"Failed to download {game_title} - {disk_number}: {e}")
+        print(f"Failed to download {game_title} - {disc_number}: {e}")
 
 # Main execution
 if __name__ == "__main__":
