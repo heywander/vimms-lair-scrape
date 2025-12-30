@@ -33,7 +33,7 @@ def scrape_data():
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        game_table = soup.find('table', {'class': 'rounded centered cellpadding1 hovertable striped'})
+        game_table = soup.find('table', class_=lambda c: c and 'hovertable' in c.split())
         
         if game_table:
             game_links = game_table.find_all('a', href=True)
